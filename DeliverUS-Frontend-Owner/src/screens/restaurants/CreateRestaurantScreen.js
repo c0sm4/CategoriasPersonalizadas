@@ -14,7 +14,7 @@ import { showMessage } from 'react-native-flash-message'
 import { ErrorMessage, Formik } from 'formik'
 import TextError from '../../components/TextError'
 
-export default function CreateRestaurantScreen ({ navigation }) {
+export default function CreateRestaurantScreen ({ navigation, route }) {
   const [open, setOpen] = useState(false)
   const [restaurantCategories, setRestaurantCategories] = useState([])
   const [backendErrors, setBackendErrors] = useState()
@@ -77,7 +77,7 @@ export default function CreateRestaurantScreen ({ navigation }) {
       }
     }
     fetchRestaurantCategories()
-  }, [])
+  }, [route])
 
   useEffect(() => {
     (async () => {
@@ -114,7 +114,7 @@ export default function CreateRestaurantScreen ({ navigation }) {
         style: GlobalStyles.flashStyle,
         titleStyle: GlobalStyles.flashTextStyle
       })
-      navigation.navigate('RestaurantsScreen', { dirty: true })
+      navigation.navigate('RestaurantsScreen', { dirty: true, refresh: true })
     } catch (error) {
       console.log(error)
       setBackendErrors(error.errors)
@@ -177,8 +177,23 @@ export default function CreateRestaurantScreen ({ navigation }) {
                 dropDownStyle={{ backgroundColor: '#fafafa' }}
               />
               <ErrorMessage name={'restaurantCategoryId'} render={msg => <TextError>{msg}</TextError> }/>
-
-              <Pressable onPress={() =>
+              <Pressable
+                onPress={() => navigation.navigate('CreateRestaurantCategory', { dirty: true })}
+                style={({ pressed }) => [
+                  {
+                    backgroundColor: pressed
+                      ? GlobalStyles.brandSuccessTap
+                      : GlobalStyles.brandSuccess
+                  },
+                  styles.button
+                ]}>
+              <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+                <MaterialCommunityIcons name='content-save' color={'white'} size={20}/>
+                <TextRegular textStyle={styles.text}>
+                  Create category
+                </TextRegular>
+              </View>
+              </Pressable>              <Pressable onPress={() =>
                 pickImage(
                   async result => {
                     await setFieldValue('logo', result)
